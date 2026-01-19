@@ -1,8 +1,6 @@
 import ErrorComponent from "@/components/ui/error";
 import { axiosInstance } from "@/lib/axios";
-import { useQueryErrorResetBoundary } from "@tanstack/react-query";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app/posts/$postId")({
 	head: ({ loaderData }) => {
@@ -18,7 +16,7 @@ export const Route = createFileRoute("/_app/posts/$postId")({
 					content: data.body,
 				},
 			],
-		}
+		};
 	},
 	loader: async ({ params, context }) => {
 		const { postId } = params;
@@ -28,8 +26,7 @@ export const Route = createFileRoute("/_app/posts/$postId")({
 				const res = await axiosInstance.get(`/posts/${postId}`);
 				return res.data;
 			},
-			staleTime: 10000,
-		})
+		});
 	},
 	pendingComponent: () => {
 		return <div>Loading...</div>;
@@ -60,5 +57,5 @@ function RouteComponent() {
 				</div>
 			</div>
 		</div>
-	)
+	);
 }

@@ -1,5 +1,5 @@
 import { AppSidebar } from "@/components/admin-sidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 export const Route = createFileRoute("/_admin")({
 	component: RouteComponent,
@@ -21,7 +21,9 @@ function RouteComponent() {
 		<>
 			<SidebarProvider>
 				<AppSidebar />
-				<Outlet />
+				<SidebarInset>
+					<Outlet />
+				</SidebarInset>
 			</SidebarProvider>
 		</>
 	);
