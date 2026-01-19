@@ -1,15 +1,8 @@
+import ErrorComponent from "@/components/ui/error";
 import { axiosInstance } from "@/lib/axios";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/posts/")({
-	component: RouteComponent,
-	loader: async () => {
-		const response = await axiosInstance.get("/posts");
-		return { data: response.data };
-	},
-	pendingComponent: () => {
-		return <div>Loading...</div>;
-	},
+export const Route = createFileRoute("/_app/posts/")({
 	head: () => ({
 		meta: [
 			{
@@ -21,10 +14,24 @@ export const Route = createFileRoute("/posts/")({
 			},
 		],
 	}),
+	loader: async ({ context }) => {
+		return context.queryClient.ensureQueryData({
+			queryKey: ["posts"],
+			queryFn: async () => {
+				const res = await axiosInstance.get("/posts");
+				return res.data;
+			},
+		})
+	},
+	pendingComponent: () => {
+		return <div>Loading...</div>;
+	},
+	errorComponent: ErrorComponent,
+	component: RouteComponent,
 });
 
 function RouteComponent() {
-	const { data } = Route.useLoaderData();
+	const data = Route.useLoaderData();
 	return (
 		<div>
 			<div className="container py-6 text-center">
@@ -46,5 +53,5 @@ function RouteComponent() {
 				))}
 			</div>
 		</div>
-	);
+	)
 }

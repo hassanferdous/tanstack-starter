@@ -5,6 +5,8 @@ import ReactDOM from "react-dom/client";
 import reportWebVitals from "./reportWebVitals.js";
 import { routeTree } from "./routeTree.gen";
 import "./styles/index.css";
+import { AuthProvider } from "./auth";
+import { useAuth } from "./auth";
 
 const router = createRouter({
 	routeTree,
@@ -15,12 +17,19 @@ const router = createRouter({
 	defaultPreloadStaleTime: 0,
 });
 
+function InnerApp() {
+	const auth = useAuth();
+	return <RouterProvider router={router} context={{ auth }} />;
+}
+
 const rootElement = document.getElementById("app");
 if (rootElement && !rootElement.innerHTML) {
 	const root = ReactDOM.createRoot(rootElement);
 	root.render(
 		<StrictMode>
-			<RouterProvider router={router} />
+			<AuthProvider>
+				<InnerApp />
+			</AuthProvider>
 		</StrictMode>,
 	);
 }

@@ -1,16 +1,10 @@
+import ErrorComponent from "@/components/ui/error";
 import { axiosInstance } from "@/lib/axios";
-import { createFileRoute } from "@tanstack/react-router";
+import { useQueryErrorResetBoundary } from "@tanstack/react-query";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useEffect } from "react";
 
-export const Route = createFileRoute("/posts/$postId")({
-	component: RouteComponent,
-	loader: async ({ params }) => {
-		const { postId } = params;
-		const { data } = await axiosInstance.get(`/posts/${postId}`);
-		return { data };
-	},
-	pendingComponent: () => {
-		return <div>Loading...</div>;
-	},
+export const Route = createFileRoute("/_app/posts/$postId")({
 	head: ({ loaderData }) => {
 		const data = (loaderData as any).data;
 
@@ -24,13 +18,29 @@ export const Route = createFileRoute("/posts/$postId")({
 					content: data.body,
 				},
 			],
-		};
+		}
 	},
+	loader: async ({ params, context }) => {
+		const { postId } = params;
+		return context.queryClient.ensureQueryData({
+			queryKey: ["posts", postId],
+			queryFn: async () => {
+				const res = await axiosInstance.get(`/posts/${postId}`);
+				return res.data;
+			},
+			staleTime: 10000,
+		})
+	},
+	pendingComponent: () => {
+		return <div>Loading...</div>;
+	},
+	errorComponent: ErrorComponent,
+	component: RouteComponent,
 });
 
 function RouteComponent() {
 	const { postId } = Route.useParams();
-	const { data } = Route.useLoaderData();
+	const data = Route.useLoaderData();
 	return (
 		<div>
 			<div className="max-w-3xl mx-auto p-8">
@@ -50,5 +60,5 @@ function RouteComponent() {
 				</div>
 			</div>
 		</div>
-	);
+	)
 }
