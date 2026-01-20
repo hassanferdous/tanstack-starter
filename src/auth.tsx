@@ -1,7 +1,6 @@
 // src/auth.tsx
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext } from "react";
 import { useAuthStore } from "./features/auth-slice";
-import { redirect, useRouter } from "@tanstack/react-router";
 
 export interface User {
 	id: string;
@@ -18,7 +17,7 @@ export interface AuthState {
 	hasAnyRole: (roles: string[]) => boolean;
 	hasPermission: (permission: string) => boolean;
 	hasAnyPermission: (permissions: string[]) => boolean;
-	signin: (username: string, password: string) => Promise<void>;
+	signin: (user: User) => void;
 	signout: () => void;
 }
 
@@ -27,14 +26,14 @@ const AuthContext = createContext<AuthState | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const { user, isAuthenticated, login, logout } = useAuthStore();
 	const hasRole = (role: string) => {
-		return user?.roles.includes(role) ?? false;
+		return user?.roles?.includes(role) ?? false;
 	};
 	const hasAnyRole = (roles: string[]) => {
 		return roles.some((role) => user?.roles.includes(role)) ?? false;
 	};
 
 	const hasPermission = (permission: string) => {
-		return user?.permissions.includes(permission) ?? false;
+		return user?.permissions?.includes(permission) ?? false;
 	};
 
 	const hasAnyPermission = (permissions: string[]) => {
@@ -45,24 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		);
 	};
 
-	const handleLogin = async (username: string, password: string) => {
-		// TODO: implement login
-		const user = {
-			id: "1",
-			username: "admin",
-			email: "admin@example.com",
-			roles: ["admin"],
-			permissions: [
-				"user:read",
-				"user:write",
-				"user:delete",
-				"user:manage",
-				"posts:read",
-				"posts:write",
-				"posts:delete",
-				"posts:manage",
-			],
-		};
+	const handleLogin = (user: User) => {
 		login(user);
 	};
 

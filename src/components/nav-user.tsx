@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/auth";
 import { useRouter } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
+import { axiosInstance } from "@/lib/axios";
 
 export function NavUser({
 	user,
@@ -35,13 +37,22 @@ export function NavUser({
 		avatar: string;
 	};
 }) {
-	const { isMobile } = useSidebar();
-
-	const { signout } = useAuth();
 	const router = useRouter();
+	const { signout } = useAuth();
+
+	const { isMobile } = useSidebar();
+	const mutation = useMutation({
+		mutationFn: () => {
+			return axiosInstance.post("/auth/logout");
+		},
+		onSuccess: () => {
+			signout();
+			router.navigate({ to: "/login" });
+		},
+	});
+
 	const handleLogout = () => {
-		signout();
-		router.navigate({ to: "/login" });
+		mutation.mutate();
 	};
 
 	return (

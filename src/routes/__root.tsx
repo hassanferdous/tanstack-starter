@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Header } from "@/components/layout/header";
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import NotFound from "@/components/ui/not-found";
 
 interface AuthState {
@@ -59,6 +59,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 	context: () => ({
 		queryClient,
 	}),
+
 	component: RootComponent,
 	notFoundComponent: NotFound,
 });
@@ -67,8 +68,10 @@ function RootComponent() {
 	return (
 		<React.Fragment>
 			<HeadContent />
+			<QueryClientProvider client={queryClient}>
+				<Outlet />
+			</QueryClientProvider>
 			<TanStackRouterDevtools />
-			<Outlet />
 		</React.Fragment>
 	);
 }
